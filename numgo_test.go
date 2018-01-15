@@ -3,11 +3,9 @@ package numgo
 
 import (
 	"fmt"
+	"math"
 	"testing"
-  "math"
 )
-
-var np = NumGo{}
 
 func fl(d ...float64) []float64 {
 	return d
@@ -34,7 +32,7 @@ func TestZeros(t *testing.T) {
 	if !np.Allclose(fl(0, 0, 0), np.Zeros([]int{3})) {
 		t.Fail()
 	}
-  if !np.Allclose(fl(0, 0, 0), np.Zeros(3)) {
+	if !np.Allclose(fl(0, 0, 0), np.Zeros(3)) {
 		t.Fail()
 	}
 }
@@ -42,7 +40,7 @@ func TestOnes(t *testing.T) {
 	if !np.Allclose(fl(1, 1, 1), np.Ones([]int{3})) {
 		t.Fail()
 	}
-  if !np.Allclose(fl(1, 1, 1), np.Ones(3)) {
+	if !np.Allclose(fl(1, 1, 1), np.Ones(3)) {
 		t.Fail()
 	}
 }
@@ -102,9 +100,9 @@ func TestLinspace2(t *testing.T) {
 	}
 }
 func TestLinspace3(t *testing.T) {
-  e:=fl(0)
-  a:=np.Linspace(0,0,1,true)
-  if !np.Allclose(e, a) || math.IsNaN(a[0]) {
+	e := fl(0)
+	a := np.Linspace(0, 0, 1, true)
+	if !np.Allclose(e, a) || math.IsNaN(a[0]) {
 		fmt.Println(a)
 		t.Fail()
 	}
@@ -171,12 +169,13 @@ func TestAbsolute(t *testing.T) {
 }
 
 func TestReciprocal(t *testing.T) {
-  e:= fl(1.,-.5,1./3.)
-  a := np.Reciprocal(fl(1,-2,3))
-  if !np.Allclose(e, a) {
-    t.Fail()
-  }
+	e := fl(1., -.5, 1./3.)
+	a := np.Reciprocal(fl(1, -2, 3))
+	if !np.Allclose(e, a) {
+		t.Fail()
+	}
 }
+
 //square,expit,logit,absolute,allclose
 func Example() {
 	fmt.Println("zeros:", np.Zeros([]int{3}))
@@ -193,6 +192,8 @@ func Example() {
 	fmt.Println("argmin:", np.Argmin(fl(1., 3., 2.)))
 	fmt.Println("argmax:", np.Argmax(fl(1., 3., 2.)))
 	fmt.Println("add:", np.Add(fl(1., 2., 3.), fl(1., 2., 3.)))
+	fmt.Println("add:", np.Add(1., fl(1., 2., 3.)))
+
 	fmt.Println("sub:", np.Sub(fl(1., 2., 3.), fl(1., 2., 3.)))
 	fmt.Println("multiply:", np.Multiply(fl(1., 2., 3.), fl(1., 2., 3.)))
 	fmt.Println("divide:", np.Divide(fl(1., 2., 3.), fl(1., 2., 3.)))
@@ -212,6 +213,7 @@ func Example() {
 	// argmin: 0
 	// argmax: 1
 	// add: [2 4 6]
+	// add: [2 3 4]
 	// sub: [0 0 0]
 	// multiply: [1 4 9]
 	// divide: [1 1 1]
