@@ -4,6 +4,7 @@ package numgo
 import (
 	"fmt"
 	"math"
+	"reflect"
 	"sort"
 )
 
@@ -31,16 +32,16 @@ type Float1 []float64
 func (o Float1) Len() int            { return len(o) }
 func (o Float1) Index(i int) float64 { return o[i] }
 
-func (NumGo) Array(ai interface{}) ifloatslice {
-	var a ifloatslice
+func (NumGo) Array(ai interface{}) Float1 {
+	var a Float1
 	switch atyped := ai.(type) {
 
 	case int:
-		a = Float0(float64(atyped))
+		a = Float1([]float64{float64(atyped)})
 	case float64:
-		a = Float0(atyped)
+		a = Float1([]float64{(atyped)})
 	case Float0:
-		a = atyped
+		a = Float1([]float64{float64(atyped)})
 	case []float64:
 		a = Float1(atyped)
 	case Float1:
@@ -59,6 +60,7 @@ func ewize1(ai interface{}, f func(x float64) float64) Float1 {
 	}
 	return Float1(r)
 }
+
 func ewize2(ai, bi interface{}, f func(x, y float64) float64) Float1 {
 	a, b := np.Array(ai), np.Array(bi)
 	if a.Len() != b.Len() {
@@ -78,12 +80,21 @@ func ewize2(ai, bi interface{}, f func(x, y float64) float64) Float1 {
 	return Float1(r)
 }
 
-func reduce(ai interface{}, f func(carry, item float64) float64, init float64) float64 {
-	a := np.Array(ai)
-	carry := init
-	for i := 0; i < a.Len(); i++ {
-		carry = f(carry, a.Index(i))
+func reduce_util(rv reflect.Value, f func(float64)) {
+	if rv.Kind() == reflect.Float64 {
+		f(rv.Float())
+	} else if rv.Kind() == reflect.Slice {
+		for i := 0; i < rv.Len(); i++ {
+			reduce_util(rv.Index(i), f)
+		}
+	} else {
+		panic(fmt.Sprintf("invalid Kind %s", rv.Kind()))
 	}
+}
+
+func reduce(ai interface{}, f func(carry, item float64) float64, init float64) float64 {
+	carry := init
+	reduce_util(reflect.ValueOf(ai), func(item float64) { carry = f(carry, item) })
 	return carry
 }
 
@@ -119,12 +130,6 @@ func (NumGo) Zeros(shape interface{}) Float1 {
 }
 func (NumGo) Ones(shape interface{}) Float1 {
 	return (NumGo{}).Full(shape, 1.)
-}
-func (NumGo) Minimum(a, b interface{}) Float1 {
-	return ewize2(a, b, math.Min)
-}
-func (NumGo) Maximum(a, b interface{}) Float1 {
-	return ewize2(a, b, math.Max)
 }
 
 //NumGo.linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None)[source]¶
@@ -189,18 +194,77 @@ func (NumGo) Argmax(ai interface{}) int {
 	return r
 }
 
-func (NumGo) Add(a, b interface{}) Float1 {
-	return ewize2(a, b, func(ai, bi float64) float64 { return ai + bi })
+func (NumGo) Minimum(ais ...interface{}) Float1 {
+	f := math.Min
+	r := np.Copy(ais[0])
+	for _, b := range ais[1:] {
+		r = ewize2(r, b, f)
+	}
+	return r
 }
-func (NumGo) Sub(a, b interface{}) Float1 {
-	return ewize2(a, b, func(ai, bi float64) float64 { return ai - bi })
+func (NumGo) Maximum(ais ...interface{}) Float1 {
+	f := math.Max
+	r := np.Copy(ais[0])
+	for _, b := range ais[1:] {
+		r = ewize2(r, b, f)
+	}
+	return r
 }
-func (NumGo) Multiply(a, b interface{}) Float1 {
-	return ewize2(a, b, func(ai, bi float64) float64 { return ai * bi })
+
+func (NumGo) Copy(ai interface{}) Float1 {
+	a := np.Array(ai)
+	r := make(Float1, a.Len(), a.Len())
+	copy(r, a)
+	return r
 }
-func (NumGo) Divide(a, b interface{}) Float1 {
-	return ewize2(a, b, func(ai, bi float64) float64 { return ai / bi })
+
+func (NumGo) Add(ais ...interface{}) Float1 {
+	f := func(a, b float64) float64 { return a + b }
+	r := np.Copy(ais[0])
+	for _, b := range ais[1:] {
+		r = ewize2(r, b, f)
+	}
+	return r
 }
+
+func (NumGo) Sub(ais ...interface{}) Float1 {
+	f := func(a, b float64) float64 { return a - b }
+	r := np.Copy(ais[0])
+	for _, b := range ais[1:] {
+		r = ewize2(r, b, f)
+	}
+	return r
+}
+func (NumGo) Multiply(ais ...interface{}) Float1 {
+	f := func(a, b float64) float64 { return a * b }
+	r := np.Copy(ais[0])
+	for _, b := range ais[1:] {
+		r = ewize2(r, b, f)
+	}
+	return r
+}
+func (NumGo) Divide(ais ...interface{}) Float1 {
+	f := func(a, b float64) float64 { return a / b }
+	r := np.Copy(ais[0])
+	for _, b := range ais[1:] {
+		r = ewize2(r, b, f)
+	}
+	return r
+}
+
+func (NumGo) Power(ais ...interface{}) Float1 {
+	f := func(a, b float64) float64 { return math.Pow(a, b) }
+	a := np.Array(ais[0])
+	r := make(Float1, a.Len(), a.Len())
+	for i := 0; i < a.Len(); i++ {
+		r[i] = a.Index(i)
+	}
+	for _, b := range ais[1:] {
+		r = ewize2(r, b, f)
+	}
+	return r
+}
+
 func (NumGo) Square(a interface{}) Float1 {
 	return (NumGo{}).Multiply(a, a)
 }

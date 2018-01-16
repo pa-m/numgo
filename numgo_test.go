@@ -7,25 +7,50 @@ import (
 	"testing"
 )
 
+func TestFloat0(t *testing.T) {
+	a := Float0(1)
+	if float64(a) != 1 || a.Len() != 1 || a.Index(0) != 1. {
+		t.Fail()
+	}
+}
+
+func TestFloat1(t *testing.T) {
+	a := Float1([]float64{1, 2})
+	if a.Len() != 2 || a.Index(0) != 1. || a.Index(1) != 2. {
+		t.Fail()
+	}
+}
 func fl(d ...float64) []float64 {
 	return d
 }
 
-func TestAddSub(t *testing.T) {
-	r := np.Sub(np.Add(fl(1, 2), fl(4, 3)), fl(4, 4))
-	if r[0] != 1. || r[1] != 1. {
+func TestCopy(t *testing.T) {
+	a := fl(1, 2)
+	b := np.Copy(a)
+	a[0] = 2
+	if !np.Allclose(fl(1, 2), b) {
 		t.Fail()
 	}
-	fmt.Println("TestAddSub ok")
 }
-
-func TestMulDiv(t *testing.T) {
-	r := np.Divide(np.Multiply(fl(1, 2), fl(4, 3)), fl(2, 2))
-	if r[0] != 2. || r[1] != 3. {
-		fmt.Println(r)
+func TestAdd(t *testing.T) {
+	if !np.Allclose(fl(5, 5), np.Add(fl(1, 2), fl(4, 3))) {
 		t.Fail()
 	}
-	fmt.Println("TestMulDiv ok")
+}
+func TestSub(t *testing.T) {
+	if !np.Allclose(fl(-3, -1), np.Sub(fl(1, 2), fl(4, 3))) {
+		t.Fail()
+	}
+}
+func TestMultiply(t *testing.T) {
+	if !np.Allclose(fl(4, 6), np.Multiply(fl(1, 2), fl(4, 3))) {
+		t.Fail()
+	}
+}
+func TestDivide(t *testing.T) {
+	if !np.Allclose(fl(1./4, 2./3), np.Divide(fl(1, 2), fl(4, 3))) {
+		t.Fail()
+	}
 }
 
 func TestZeros(t *testing.T) {
@@ -145,6 +170,15 @@ func TestArgmax(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestPower(t *testing.T) {
+	e := fl(1, 4, 9)
+	a := np.Power(fl(1, -2, 3), 2.)
+	if !np.Allclose(e, a) {
+		t.Fail()
+	}
+}
+
 func TestSquare(t *testing.T) {
 	e := fl(1, 4, 9)
 	a := np.Square(fl(1, -2, 3))
@@ -161,17 +195,13 @@ func TestExpitLogit(t *testing.T) {
 	}
 }
 func TestAbsolute(t *testing.T) {
-	e := fl(1, 2, 3)
-	a := np.Absolute(fl(1, -2, 3))
-	if !np.Allclose(e, a) {
+	if !np.Allclose(fl(1, 2, 3), np.Absolute(fl(1, -2, 3))) {
 		t.Fail()
 	}
 }
 
 func TestReciprocal(t *testing.T) {
-	e := fl(1., -.5, 1./3.)
-	a := np.Reciprocal(fl(1, -2, 3))
-	if !np.Allclose(e, a) {
+	if !np.Allclose(fl(1., -.5, 1./3.), np.Reciprocal(fl(1, -2, 3))) {
 		t.Fail()
 	}
 }
