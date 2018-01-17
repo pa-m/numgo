@@ -1,4 +1,4 @@
-// a simple numpy-like subset for 1d float64 slices
+// a simple numpy-like subset for 1d float64 slices. For numpy addict. You may use gonum instead
 package numgo
 
 import (

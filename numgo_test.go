@@ -7,6 +7,10 @@ import (
 	"testing"
 )
 
+func fl(d ...float64) []float64 {
+	return d
+}
+
 func TestFloat0(t *testing.T) {
 	a := Float0(1)
 	if float64(a) != 1 || a.Len() != 1 || a.Index(0) != 1. {
@@ -19,9 +23,21 @@ func TestFloat1(t *testing.T) {
 	if a.Len() != 2 || a.Index(0) != 1. || a.Index(1) != 2. {
 		t.Fail()
 	}
+	defer func() { recover() }()
+	Float0(1.).Index(1)
+	t.Fail()
 }
-func fl(d ...float64) []float64 {
-	return d
+
+func TestArray(t *testing.T) {
+	if !np.Allclose(np.Array(1), fl(1)) {
+		t.Fail()
+	}
+	if !np.Allclose(np.Array(Float0(1)), fl(1)) {
+		t.Fail()
+	}
+	defer func() { recover() }()
+	np.Array("")
+	t.Fail()
 }
 
 func TestCopy(t *testing.T) {
@@ -36,6 +52,9 @@ func TestAdd(t *testing.T) {
 	if !np.Allclose(fl(5, 5), np.Add(fl(1, 2), fl(4, 3))) {
 		t.Fail()
 	}
+	defer func() { recover() }()
+	np.Add(fl(1, 2), fl(3, 4, 5))
+	t.Fail()
 }
 func TestSub(t *testing.T) {
 	if !np.Allclose(fl(-3, -1), np.Sub(fl(1, 2), fl(4, 3))) {
@@ -132,6 +151,14 @@ func TestLinspace3(t *testing.T) {
 		t.Fail()
 	}
 }
+func TestLinspace4(t *testing.T) {
+	e := fl()
+	a := np.Linspace(0, 0, 0, false)
+	if !np.Allclose(e, a) {
+		fmt.Println(a)
+		t.Fail()
+	}
+}
 func TestLogspace(t *testing.T) {
 	e := fl(1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3)
 	a := np.Logspace(-3, 3, 7, true, 10)
@@ -156,8 +183,8 @@ func TestArgsort(t *testing.T) {
 	}
 }
 func TestArgmin(t *testing.T) {
-	e := 0
-	a := np.Argmin(fl(1, 3, 2))
+	e := 1
+	a := np.Argmin(fl(4, 1, 3, 2))
 	if e != a {
 		t.Fail()
 	}
@@ -200,8 +227,18 @@ func TestAbsolute(t *testing.T) {
 	}
 }
 
+func TestAallclose(t *testing.T) {
+	if np.Allclose(fl(1, 2, 3), fl(1, 2, 4), 1e-5, 1e-8) {
+		t.Fail()
+	}
+}
+
 func TestReciprocal(t *testing.T) {
 	if !np.Allclose(fl(1., -.5, 1./3.), np.Reciprocal(fl(1, -2, 3))) {
+		t.Fail()
+	}
+	defer func() { recover() }()
+	if np.Allclose(fl(1), fl(1, 2)) {
 		t.Fail()
 	}
 }
