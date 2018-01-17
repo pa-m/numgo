@@ -1,6 +1,12 @@
-# numgo is a small numpy-like module for my own use. use gonum instead
+# numgo
+##is a small numpy-like module for my own use. use gonum instead
 
-usage:
+[![Build Status](https://travis-ci.org/pa-m/numgo.svg?branch=master)](https://travis-ci.org/pa-m/numgo)
+[![Code Coverage](https://codecov.io/gh/pa-m/numgo/branch/master/graph/badge.svg)](https://codecov.io/gh/pa-m/numgo)
+[![Go Report Card](https://goreportcard.com/badge/github.com/pa-m/numgo)](https://goreportcard.com/report/github.com/pa-m/numgo)
+[![GoDoc](https://godoc.org/github.com/pa-m/numgo?status.svg)](https://godoc.org/github.com/pa-m/numgo)
+
+###usage:
 ```go
 import (
   "fmt"
