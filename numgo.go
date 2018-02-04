@@ -31,7 +31,8 @@ type Float1 []float64
 
 func (o Float1) Len() int            { return len(o) }
 func (o Float1) Index(i int) float64 { return o[i] }
-
+func (o Float1) Swap(i, j int)       { a := o[i]; o[i] = o[j]; o[j] = a }
+func (o Float1) Less(i, j int) bool  { return o[i] < o[j] }
 func (NumGo) Array(ai interface{}) Float1 {
 	var a Float1
 	switch atyped := ai.(type) {
@@ -48,6 +49,11 @@ func (NumGo) Array(ai interface{}) Float1 {
 		a = atyped
 	default:
 		panic(fmt.Sprintf("unhandled type %T", atyped))
+	}
+	for i, ai := range a {
+		if math.IsNaN(ai) {
+			panic(fmt.Sprintf("nan at index %d", i))
+		}
 	}
 	return a
 }
@@ -113,6 +119,21 @@ func (NumGo) Mean(ai interface{}) float64 {
 	a := np.Array(ai)
 	return (NumGo{}).Sum(a) / float64(a.Len())
 }
+func (NumGo) Median(ai interface{}) float64 {
+	a := np.Array(ai)
+	a1 := np.Copy(a)
+	sort.Sort(a1)
+	l := len(a)
+	switch {
+	case l == 0:
+		return math.NaN()
+	case l&1 == 1:
+		return a1[(l-1)/2]
+	default:
+		return (a1[l/2-1] + a1[l/2]) / 2.
+	}
+}
+
 func (NumGo) Full(ishape interface{}, fill_value float64) Float1 {
 	n, ok := ishape.(int)
 	if !ok {

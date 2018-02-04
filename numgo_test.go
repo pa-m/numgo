@@ -114,6 +114,17 @@ func TestMean(t *testing.T) {
 		t.Fail()
 	}
 }
+func TestMedian(t *testing.T) {
+	if !math.IsNaN(np.Median(fl())) {
+		t.Fail()
+	}
+	if np.Median(fl(1, 2, 3, 5)) != 2.5 {
+		t.Fail()
+	}
+	if np.Median(fl(1, 2, 5)) != 2. {
+		t.Fail()
+	}
+}
 func TestMinimum(t *testing.T) {
 	if !np.Allclose(fl(1, 2, 2), np.Minimum(fl(1, 2, 3), fl(2, 2, 2))) {
 		t.Fail()
