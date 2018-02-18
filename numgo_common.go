@@ -6,6 +6,7 @@ import (
 	"math"
 	"reflect"
 )
+
 type ifloatslice interface {
 	Len() int
 	Index(int) float64
@@ -57,7 +58,6 @@ func (NumGo) Array(ai interface{}) Float1 {
 	}
 	return a
 }
-
 
 func ewize1(ai interface{}, f func(x float64) float64) Float1 {
 	a := np.Array(ai)
@@ -124,39 +124,12 @@ func (NumGo) Ones(shape interface{}) Float1 {
 	return (NumGo{}).Full(shape, 1.)
 }
 
-
 func (NumGo) Copy(ai interface{}) Float1 {
 	a := np.Array(ai)
 	r := make(Float1, a.Len(), a.Len())
 	copy(r, a)
 	return r
 }
-
-//NumGo.linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None)[source]¶
-func (NumGo) Linspace(start, stop float64, num int, endPoint bool) Float1 {
-	step := 0.
-	if endPoint {
-		if num == 1 {
-			return []float64{start}
-		}
-		step = (stop - start) / float64(num-1)
-	} else {
-		if num == 0 {
-			return []float64{}
-		}
-		step = (stop - start) / float64(num)
-	}
-	r := make([]float64, num, num)
-	for i := 0; i < num; i++ {
-		r[i] = start + float64(i)*step
-	}
-	return r
-}
-
-func (NumGo) Logspace(start, stop float64, num int, endPoint bool, base float64) Float1 {
-	return ewize1((NumGo{}).Linspace(start, stop, num, endPoint), func(x float64) float64 { return math.Pow(base, x) })
-}
-
 
 func (NumGo) Minimum(ais ...interface{}) Float1 {
 	f := math.Min

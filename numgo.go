@@ -153,3 +153,28 @@ func (NumGo) Allclose(ai, bi interface{}, opts ...float64) bool {
 	//fmt.Println("allclose:true")
 	return true
 }
+
+//NumGo.linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None)[source]¶
+func (NumGo) Linspace(start, stop float64, num int, endPoint bool) Float1 {
+	step := 0.
+	if endPoint {
+		if num == 1 {
+			return []float64{start}
+		}
+		step = (stop - start) / float64(num-1)
+	} else {
+		if num == 0 {
+			return []float64{}
+		}
+		step = (stop - start) / float64(num)
+	}
+	r := make([]float64, num, num)
+	for i := 0; i < num; i++ {
+		r[i] = start + float64(i)*step
+	}
+	return r
+}
+
+func (NumGo) Logspace(start, stop float64, num int, endPoint bool, base float64) Float1 {
+	return ewize1((NumGo{}).Linspace(start, stop, num, endPoint), func(x float64) float64 { return math.Pow(base, x) })
+}

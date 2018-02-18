@@ -3,9 +3,9 @@
 package numgo
 
 import (
-  "fmt"
-  "math"
-  "github.com/gonum/floats"
+	"fmt"
+	"github.com/gonum/floats"
+	"math"
 )
 
 func (NumGo) Sum(ai interface{}) float64 {
@@ -24,27 +24,29 @@ func (NumGo) Allclose(ai, bi interface{}, opts ...float64) bool {
 	if len(opts) > 1 {
 		atol = opts[1]
 	}
-  for i:=range(a){
-    if !floats.EqualWithinAbsOrRel(a.Index(i), b.Index(i), atol, rtol) {return false}
-  }
+	for i := range a {
+		if !floats.EqualWithinAbsOrRel(a.Index(i), b.Index(i), atol, rtol) {
+			return false
+		}
+	}
 	return true
 }
 
-func broadcast(r *Float1,bi interface{}) Float1 {
-    b:=np.Array(bi)
-    if (*r).Len()==1 && b.Len()>1 {
-      *r = np.Full(b.Len(),(*r).Index(0))
-    } else if (*r).Len()>1 && b.Len()==1 {
-      b = np.Full((*r).Len(),b.Index(0))
-    }
-    return b
+func broadcast(r *Float1, bi interface{}) Float1 {
+	b := np.Array(bi)
+	if (*r).Len() == 1 && b.Len() > 1 {
+		*r = np.Full(b.Len(), (*r).Index(0))
+	} else if (*r).Len() > 1 && b.Len() == 1 {
+		b = np.Full((*r).Len(), b.Index(0))
+	}
+	return b
 }
 
 func (NumGo) Add(ais ...interface{}) Float1 {
 	r := np.Copy(ais[0])
 	for _, bi := range ais[1:] {
-    b:=broadcast(&r,bi)
-    floats.Add(r,b)
+		b := broadcast(&r, bi)
+		floats.Add(r, b)
 	}
 	return r
 }
@@ -52,23 +54,23 @@ func (NumGo) Add(ais ...interface{}) Float1 {
 func (NumGo) Sub(ais ...interface{}) Float1 {
 	r := np.Copy(ais[0])
 	for _, bi := range ais[1:] {
-    b:=broadcast(&r,bi)
-    floats.Sub(r,b)
+		b := broadcast(&r, bi)
+		floats.Sub(r, b)
 	}
 	return r
 }
 func (NumGo) Multiply(ais ...interface{}) Float1 {
 	r := np.Copy(ais[0])
 	for _, bi := range ais[1:] {
-    b:=broadcast(&r,bi)
-    floats.Mul(r,b)
+		b := broadcast(&r, bi)
+		floats.Mul(r, b)
 	}
 	return r
 }
 func (NumGo) Divide(ais ...interface{}) Float1 {
 	r := np.Copy(ais[0])
 	for _, bi := range ais[1:] {
-    b:=broadcast(&r,bi)
+		b := broadcast(&r, bi)
 		floats.Div(r, b)
 	}
 	return r
@@ -105,9 +107,9 @@ func (NumGo) Mean(ai interface{}) float64 {
 }
 func (NumGo) Median(ai interface{}) float64 {
 	a := np.Array(ai)
-  l:=a.Len()
-  ids:=make([]int,l,l)
-  floats.Argsort(a, ids)
+	l := a.Len()
+	ids := make([]int, l, l)
+	floats.Argsort(a, ids)
 	switch {
 	case l == 0:
 		return math.NaN()
@@ -118,19 +120,54 @@ func (NumGo) Median(ai interface{}) float64 {
 	}
 }
 
-
 func (NumGo) Argsort(ai interface{}) []int {
-  a:=np.Array(ai)
-  l:=a.Len()
-  i:=make([]int,l,l)
-  floats.Argsort(a,i)
-  return i
+	a := np.Array(ai)
+	l := a.Len()
+	i := make([]int, l, l)
+	floats.Argsort(a, i)
+	return i
 }
 func (NumGo) Argmin(ai interface{}) int {
 	a := np.Array(ai)
-  return floats.MinIdx(a)
+	return floats.MinIdx(a)
 }
 func (NumGo) Argmax(ai interface{}) int {
 	a := np.Array(ai)
 	return floats.MaxIdx(a)
 }
+
+//NumGo.linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None)[source]¶
+func (NumGo) Linspace(start, stop float64, num int, endPoint bool) Float1 {
+	if num == 0 {
+		return []float64{}
+	} else if num == 1 {
+		return []float64{start}
+	}
+	num1 := num
+	if !endPoint {
+		num1 += 1
+	}
+	a := make([]float64, num1, num1)
+	floats.Span(a, start, stop)
+	return a[0:num]
+}
+
+func (NumGo) Logspace(start, stop float64, num int, endPoint bool, base float64) Float1 {
+	return ewize1((NumGo{}).Linspace(start, stop, num, endPoint), func(x float64) float64 { return math.Pow(base, x) })
+}
+
+/*
+func (NumGo) Logspace(start, stop float64, num int, endPoint bool, base float64) Float1 {
+	if num == 0 {
+		return []float64{}
+	} else if num == 1 {
+		return []float64{start}
+	}
+	num1 := num
+	if !endPoint {
+		num1 += 1
+	}
+	a := make([]float64, num1, num1)
+	floats.LogSpan(a, math.Pow(10., start), math.Pow(10, stop))
+	return a[0:num]
+}*/
