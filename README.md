@@ -13,7 +13,7 @@ import (
   "pa-m/numgo"
 )
 
-var np = numgo.NomGo{}
+var np = numgo.NumGo{}
 
 func fl(d ...float64) []float64 {
 	return d
